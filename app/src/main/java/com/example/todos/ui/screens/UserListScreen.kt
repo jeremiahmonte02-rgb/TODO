@@ -1,18 +1,32 @@
 package com.example.todos.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout. PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx. compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose. foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose. foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx. compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose. material3.Text
 import androidx. compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui. text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,26 +45,24 @@ import com.example.todos.data.model. User
 @Composable
 fun UserListScreen(
     users: List<User>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier, // add this
+    onUserClick: (User) -> Unit
 ) {
-    // LazyColumn is like RecyclerView - only composes visible items
-    // Perfect for large lists for better performance
     LazyColumn(
-        modifier = modifier.fillMaxSize(), // Fill entire screen
-        contentPadding = PaddingValues(16.dp), // Padding around the list
-        verticalArrangement = Arrangement.spacedBy(12.dp) // Space between items
+        modifier = modifier, // use it here
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // items() is a LazyColumn DSL that creates items from a list
-        // key = { it.id } helps with recomposition optimization
-        items(
-            items = users,
-            key = { user -> user.id } // Unique key for each item
-        ) { user ->
-            // Composable for each user item
-            UserItem(user = user)
+        items(users) { user ->
+            UserItem(
+                user = user,
+                onClick = { onUserClick(user) }
+            )
         }
     }
 }
+
+
 
 /**
  * Composable for individual user card
@@ -59,73 +71,48 @@ fun UserListScreen(
  * @param user User object to display
  */
 @Composable
-fun UserItem(
-    user: User,
-    modifier: Modifier = Modifier
-) {
-    // Card provides elevation and shape
+fun UserItem(user: User, onClick: () -> Unit) {
     Card(
-        modifier = modifier. fillMaxWidth(), // Card fills width of parent
-        elevation = CardDefaults. cardElevation(
-            defaultElevation = 4.dp // Elevation (shadow) of card
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme. colorScheme.surface // Card background color
-        )
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        // Column arranges children vertically
-        Column(
-            modifier = Modifier. padding(16.dp) // Padding inside card
-        ) {
-            // User name - bold and larger text
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = user.name,
-                style = MaterialTheme. typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme. onSurface
+                style = MaterialTheme.typography.titleLarge
             )
-
-            // Username - smaller text
             Text(
                 text = "@${user.username}",
-                style = MaterialTheme.typography. bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) // Slightly transparent
+                style = MaterialTheme.typography.bodyMedium
             )
-
-            // Email with icon-like prefix
-            Text(
-                text = "📧 ${user.email}",
-                style = MaterialTheme. typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
-            // Phone with icon-like prefix
-            Text(
-                text = "📞 ${user.phone}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(top = 4.dp)
-            )
-
-            // City with icon-like prefix
-            Text(
-                text = "📍 ${user.address.city}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(top = 4.dp)
-            )
-
-            // Company name with icon-like prefix
-            Text(
-                text = "🏢 ${user.company.name}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme. colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(top = 4.dp)
-            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Email, contentDescription = "Email", modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(user.email, style = MaterialTheme.typography.bodySmall)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Phone, contentDescription = "Phone", modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(user.phone, style = MaterialTheme.typography.bodySmall)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.LocationOn, contentDescription = "City", modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(user.address.city, style = MaterialTheme.typography.bodySmall)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Business, contentDescription = "Company", modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(user.company.name, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
+
+
 
 /**
  * Preview for UserItem in Android Studio
@@ -154,5 +141,7 @@ fun UserItemPreview() {
         )
     )
 
-    UserItem(user = sampleUser)
+    UserItem(user = sampleUser,
+            onClick = {}
+    )
 }

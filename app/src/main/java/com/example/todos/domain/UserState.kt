@@ -1,5 +1,6 @@
 package com.example.todos.domain
 
+import com.example.todos.data.model.Todo
 import com.example.todos.data.model.User
 
 /**
@@ -25,4 +26,20 @@ sealed class UserState {
      * @param message Error message to display to the user
      */
     data class Error(val message: String) : UserState()
+}
+
+sealed class ScreenState {
+
+    data object UserList : ScreenState()
+
+    data class TodoList(
+        val userId: Int,
+        val userName: String
+    ) : ScreenState()
+}
+
+sealed class TodoState {
+    data object Loading : TodoState()
+    data class Success(val todos: List<Todo>) : TodoState()
+    data class Error(val message: String) : TodoState()
 }

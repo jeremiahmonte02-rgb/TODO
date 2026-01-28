@@ -2,7 +2,11 @@ package com.example.todos.ui.viewmodel
 
 import androidx.lifecycle. ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todos.data.model.User
+import com.example.todos.data.repository.TodoRepository
 import com.example.todos.data.repository.UserRepository
+import com.example.todos.domain.ScreenState
+import com.example.todos.domain.TodoState
 import com.example.todos.domain.UserState
 import kotlinx.coroutines.flow. MutableStateFlow
 import kotlinx. coroutines.flow.StateFlow
@@ -23,6 +27,8 @@ class UserViewModel :  ViewModel() {
 
     // Mutable state flow - private, can only be modified within ViewModel
     private val _userState = MutableStateFlow<UserState>(UserState.Loading)
+    private val _screenState = MutableStateFlow<ScreenState>(ScreenState.UserList)
+    val screenState = _screenState.asStateFlow()
 
     // Public immutable state flow - exposed to UI
     // UI can collect this but cannot modify it
@@ -79,4 +85,18 @@ class UserViewModel :  ViewModel() {
     fun retry() {
         loadUsers()
     }
+
+    fun openTodos(user: User) {
+        _screenState.value = ScreenState.TodoList(
+            userId = user.id,
+            userName = user.name
+        )
+    }
+
+    fun goBackToUsers() {
+        _screenState.value = ScreenState.UserList
+    }
+
 }
+
+
